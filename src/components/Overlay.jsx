@@ -64,9 +64,9 @@ export default function Overlay({ onNavigate }) {
     <div className="w-full text-white/90">
       {/* Halaman 1: Hero */}
       <section className="relative flex h-screen flex-col justify-end px-6 pb-28 pt-24 md:justify-center md:pb-0 md:pl-32">
-        <p className="mb-4 font-sans text-sm text-amber-200/80">Eau de Parfum, 50 ml</p>
+        <p className="mb-4 font-sans text-sm text-amber-200/80">Eau de Parfum, 30 ml</p>
         <h1 className="bg-linear-to-r from-amber-200 to-yellow-600 bg-clip-text text-7xl font-black uppercase tracking-widest text-transparent md:text-9xl">
-          AURA
+          Yisery
         </h1>
         <p className="mt-4 max-w-lg text-xl font-light italic text-white/70 md:text-2xl">
           &ldquo;Elegansi yang tak lekang oleh waktu.&rdquo;
@@ -103,7 +103,7 @@ export default function Overlay({ onNavigate }) {
         <div className="flex flex-1 flex-col items-center justify-end px-6 pb-8 text-center md:pb-10">
           <h2 className="text-5xl font-bold tracking-wider md:text-7xl">OWN IT.</h2>
           <p className="mt-3 max-w-md font-sans text-sm font-light text-white/60 md:text-base">
-            Edisi terbatas. Satu botol, tiga lapis aroma dari tiga benua.
+            Edisi terbatas. Satu botol, tiga lapis aroma, lima bahan dari berbagai penjuru dunia.
           </p>
           <button className="mt-6 cursor-pointer bg-linear-to-r from-amber-700 to-yellow-600 px-10 py-4 text-lg tracking-widest text-white uppercase transition-transform duration-300 hover:scale-105">
             Pre-order Exclusive
