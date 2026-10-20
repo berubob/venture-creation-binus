@@ -5,9 +5,9 @@ export default function Footer({ onNavigate }) {
     <footer className="border-t border-white/10 bg-black/50 px-6 pb-4 pt-6 font-sans backdrop-blur-md md:px-10">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 md:grid-cols-4">
         <div className="col-span-2 md:col-span-1">
-          <p className="font-serif text-xl font-black tracking-[0.3em] text-amber-200">AURA</p>
+          <p className="font-serif text-xl font-black tracking-[0.3em] text-amber-200">VNS</p>
           <p className="mt-2 hidden max-w-xs text-sm leading-relaxed text-white/50 md:block">
-            Eau de parfum dengan tiga lapis aroma: bergamot, jasmine, dan amber.
+            Eau de parfum dengan tiga lapis aroma: mandarin dan ceri hitam, orange blossom, serta vanila dan amber.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default function Footer({ onNavigate }) {
       </div>
 
       <div className="mx-auto mt-5 flex max-w-7xl flex-col gap-1 border-t border-white/10 pt-3 text-xs text-white/40 md:flex-row md:justify-between">
-        <p>&copy; 2026 AURA Parfum. Seluruh hak cipta dilindungi.</p>
+        <p>&copy; 2026 VNS Parfum. Seluruh hak cipta dilindungi.</p>
         <p>Proyek Venture Creation, BINUS University</p>
       </div>
     </footer>

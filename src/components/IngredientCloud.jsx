@@ -1,16 +1,36 @@
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
+import { buildVariant } from '../modelUtils';
+
+// Taruh file di: public/models/aura_ingredients_3d.glb
+export const INGREDIENT_MODEL = '/models/aura_ingredients_3d.glb';
+useGLTF.preload(INGREDIENT_MODEL);
 
 const rand = (n) => {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
 };
 
-
 export default function IngredientCloud({ index, weights, config }) {
-  const meshRef = useRef();
+  const { scene } = useGLTF(INGREDIENT_MODEL);
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  const meshes = useRef([]); // meshes.current[variant][part]
+
+  // Tiap variant = satu model (mis. satu jeruk, satu polong vanila), digabung per material
+  const variants = useMemo(
+    () =>
+      config.variants.map((names) =>
+        buildVariant(scene, names, { flat: config.flat, glow: config.glow })
+      ),
+    [scene, config]
+  );
+  const V = variants.length;
+  const counts = useMemo(
+    () => variants.map((_, v) => Math.ceil((config.count - v) / V)),
+    [variants, V, config.count]
+  );
 
   const particles = useMemo(() => {
     const seed = index * 1000;
@@ -25,55 +45,61 @@ export default function IngredientCloud({ index, weights, config }) {
   }, [config.count, index]);
 
   useFrame((state) => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
+    const w = THREE.MathUtils.clamp(weights.current[index] ?? 0, 0, 1);
+    const visible = w > 0.002;
 
-    const w = weights.current[index];
-    mesh.visible = w > 0.002;
-    if (!mesh.visible) return;
+    meshes.current.forEach((list) => list?.forEach((m) => m && (m.visible = visible)));
+    if (!visible) return;
 
     const t = state.clock.elapsedTime;
-    const [sx, sy, sz] = config.stretch;
 
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
-      const r = THREE.MathUtils.lerp(0.2, p.radius, w);
-      const a = p.angle + t * p.speed * config.dir;
+      const v = i % V;
+      const instanceIndex = Math.floor(i / V);
+
+      const radius = THREE.MathUtils.lerp(0.2, p.radius, w);
+      const angle = p.angle + t * p.speed * config.dir * 0.45;
 
       dummy.position.set(
-        Math.cos(a) * r,
-        p.height * w + Math.sin(t * 0.8 + p.phase) * 0.15,
-        Math.sin(a) * r
+        Math.cos(angle) * radius,
+        p.height * w + Math.sin(t * 0.55 + p.phase) * 0.08,
+        Math.sin(angle) * radius
       );
-      dummy.rotation.set(t * p.speed + p.phase, t * p.speed * 1.3, p.phase);
-
-      const s = config.size * p.size * w;
-      dummy.scale.set(s * sx, s * sy, s * sz);
+      // Rotasi dibatasi: menghadap arah orbit + goyang halus, tidak berputar liar
+      dummy.rotation.set(
+        Math.sin(t * 0.3 + p.phase) * 0.15,
+        angle,
+        Math.cos(t * 0.4 + p.phase) * 0.12
+      );
+      dummy.scale.setScalar(config.size * p.size * w);
       dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
+
+      meshes.current[v]?.forEach((m) => {
+        if (m && instanceIndex < counts[v]) m.setMatrixAt(instanceIndex, dummy.matrix);
+      });
     }
-    mesh.instanceMatrix.needsUpdate = true;
+
+    meshes.current.forEach((list) => list?.forEach((m) => m && (m.instanceMatrix.needsUpdate = true)));
   });
 
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[undefined, undefined, config.count]}
-      frustumCulled={false}
-      castShadow
-    >
-      {config.shape === 'dodeca' ? (
-        <dodecahedronGeometry args={[1, 0]} />
-      ) : (
-        <sphereGeometry args={[1, 20, 20]} />
+    <group>
+      {variants.map((parts, v) =>
+        parts.map((part, j) => (
+          <instancedMesh
+            key={`${v}-${j}`}
+            ref={(el) => {
+              if (!meshes.current[v]) meshes.current[v] = [];
+              meshes.current[v][j] = el;
+            }}
+            args={[part.geometry, part.material, counts[v]]}
+            frustumCulled={false}
+            visible={false}
+            castShadow
+          />
+        ))
       )}
-      <meshStandardMaterial
-        color={config.color}
-        emissive={config.emissive}
-        emissiveIntensity={config.emissiveIntensity}
-        roughness={config.roughness}
-        metalness={config.metalness}
-      />
-    </instancedMesh>
+    </group>
   );
 }

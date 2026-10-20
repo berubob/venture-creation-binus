@@ -38,7 +38,7 @@ export default function Navbar({ onNavigate }) {
           className="font-serif text-2xl font-black tracking-[0.3em] text-amber-200 cursor-pointer"
           aria-label="Kembali ke awal"
         >
-          AURA
+          VNS
         </button>
 
         <ul className="hidden items-center gap-8 font-sans text-sm text-white/70 md:flex">
