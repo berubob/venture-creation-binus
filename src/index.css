@@ -4,6 +4,12 @@
 @theme {
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Jost', system-ui, sans-serif;
+  /* Palet kemasan: kertas krem, tinta navy, gold foil */
+  --color-paper: #efe7d8;
+  --color-ink: #1b2340;
+  --color-slate-ink: #6b7798;
+  --color-gold: #c9962f;
+  --color-gold-deep: #8a5a14;
 }
 
 html,
@@ -13,20 +19,20 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #050505;
+  background-color: #efe7d8;
   overflow: hidden;
 }
 
 body {
   font-family: 'Playfair Display', Georgia, serif;
-  color: #fff;
+  color: #1b2340;
   -webkit-font-smoothing: antialiased;
 }
 
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 2px solid #fde68a;
+  outline: 2px solid #8a5a14;
   outline-offset: 3px;
 }
 
