@@ -32,7 +32,7 @@ export default function Navbar({ onNavigate }) {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-ink/10 bg-paper/70 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-ink/10 bg-paper/90 shadow-sm shadow-ink/5 backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <button
           onClick={() => go(0)}
@@ -42,7 +42,7 @@ export default function Navbar({ onNavigate }) {
           VNS
         </button>
 
-        <ul className="hidden items-center gap-8 font-sans text-sm text-ink/60 md:flex">
+        <ul className="hidden items-center gap-8 font-sans text-sm font-medium text-ink/80 md:flex">
           {LINKS.slice(0, -1).map((l) => (
             <li key={l.label}>
               <button
