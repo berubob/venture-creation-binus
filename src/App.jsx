@@ -11,6 +11,7 @@ import {
 import PerfumeBottle from './components/PerfumeBottle';
 import Overlay from './components/Overlay';
 import Navbar from './components/Navbar';
+import InkBackground from './components/InkBackground';
 import { PAGES } from './data/ingredients';
 import { setScrollEl, scrollToPage } from './scrollStore';
 
@@ -27,28 +28,32 @@ function ScrollBridge() {
 
 export default function App() {
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative h-screen w-screen bg-paper">
+      <InkBackground />
       <Navbar onNavigate={goTo} />
 
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 7], fov: 45 }}>
-        <ambientLight intensity={0.5} />
-        <spotLight position={[5, 10, 5]} angle={0.15} penumbra={1} intensity={2} castShadow />
-        <Environment preset="studio" />
+      {/* Canvas transparan, di atas lukisan latar */}
+      <div className="absolute inset-0 z-10">
+        <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 7], fov: 45 }}>
+          <ambientLight intensity={0.6} />
+          <spotLight position={[5, 10, 5]} angle={0.15} penumbra={1} intensity={2} castShadow />
+          <Environment preset="studio" />
 
-        <ScrollControls pages={PAGES} damping={0.2}>
-          <ScrollBridge />
+          <ScrollControls pages={PAGES} damping={0.2}>
+            <ScrollBridge />
 
-          <PerfumeBottle />
+            <PerfumeBottle />
 
-          <Sparkles count={60} scale={[12, 8, 4]} size={2} speed={0.3} color="#f5d38a" />
+            <Sparkles count={60} scale={[12, 8, 4]} size={3} speed={0.3} color="#c9962f" />
 
-          <ContactShadows position={[0, -1.5, 0]} opacity={0.5} scale={10} blur={2} far={4} />
+            <ContactShadows position={[0, -1.5, 0]} opacity={0.35} scale={10} blur={2.4} far={4} color="#3a2a14" />
 
-          <Scroll html style={{ width: '100%' }}>
-            <Overlay onNavigate={goTo} />
-          </Scroll>
-        </ScrollControls>
-      </Canvas>
+            <Scroll html style={{ width: '100%' }}>
+              <Overlay onNavigate={goTo} />
+            </Scroll>
+          </ScrollControls>
+        </Canvas>
+      </div>
     </div>
   );
 }
