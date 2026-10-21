@@ -4,9 +4,12 @@ import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { buildVariant } from '../modelUtils';
 
-// Taruh file di: public/models/aura_ingredients_3d.glb
 export const INGREDIENT_MODEL = '/models/aura_ingredients_3d.glb';
 useGLTF.preload(INGREDIENT_MODEL);
+
+const ORBIT_MIN = 1.05;
+const ORBIT_SPAN = 0.45;
+const ORBIT_HEIGHT = 3.0; 
 
 const rand = (n) => {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -16,9 +19,9 @@ const rand = (n) => {
 export default function IngredientCloud({ index, weights, config }) {
   const { scene } = useGLTF(INGREDIENT_MODEL);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  const meshes = useRef([]); // meshes.current[variant][part]
+  const meshes = useRef([]); 
+  const wasVisible = useRef(false);
 
-  // Tiap variant = satu model (mis. satu jeruk, satu polong vanila), digabung per material
   const variants = useMemo(
     () =>
       config.variants.map((names) =>
@@ -36,8 +39,8 @@ export default function IngredientCloud({ index, weights, config }) {
     const seed = index * 1000;
     return Array.from({ length: config.count }, (_, i) => ({
       angle: rand(seed + i * 3 + 1) * Math.PI * 2,
-      radius: 1.7 + rand(seed + i * 5 + 2) * 1.0,
-      height: (rand(seed + i * 7 + 3) - 0.5) * 3.4,
+      radius: ORBIT_MIN + rand(seed + i * 5 + 2) * ORBIT_SPAN,
+      height: (rand(seed + i * 7 + 3) - 0.5) * ORBIT_HEIGHT,
       speed: 0.15 + rand(seed + i * 11 + 4) * 0.35,
       phase: rand(seed + i * 13 + 5) * Math.PI * 2,
       size: 0.6 + rand(seed + i * 17 + 6) * 0.8,
@@ -48,7 +51,10 @@ export default function IngredientCloud({ index, weights, config }) {
     const w = THREE.MathUtils.clamp(weights.current[index] ?? 0, 0, 1);
     const visible = w > 0.002;
 
-    meshes.current.forEach((list) => list?.forEach((m) => m && (m.visible = visible)));
+    if (visible !== wasVisible.current) {
+      wasVisible.current = visible;
+      meshes.current.forEach((list) => list?.forEach((m) => m && (m.visible = visible)));
+    }
     if (!visible) return;
 
     const t = state.clock.elapsedTime;
@@ -66,7 +72,6 @@ export default function IngredientCloud({ index, weights, config }) {
         p.height * w + Math.sin(t * 0.55 + p.phase) * 0.08,
         Math.sin(angle) * radius
       );
-      // Rotasi dibatasi: menghadap arah orbit + goyang halus, tidak berputar liar
       dummy.rotation.set(
         Math.sin(t * 0.3 + p.phase) * 0.15,
         angle,
@@ -96,7 +101,6 @@ export default function IngredientCloud({ index, weights, config }) {
             args={[part.geometry, part.material, counts[v]]}
             frustumCulled={false}
             visible={false}
-            castShadow
           />
         ))
       )}
