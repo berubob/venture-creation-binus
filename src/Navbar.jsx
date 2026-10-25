@@ -18,9 +18,8 @@ export default function Navbar({ onNavigate }) {
     if (!scrollEl) return;
     const onScroll = () => {
       const max = scrollEl.scrollHeight - scrollEl.clientHeight;
-      const p = max > 0 ? scrollEl.scrollTop / max : 0;
-      setProgress(p);
-      setActive(Math.round(p * (PAGES - 1)));
+      setProgress(max > 0 ? scrollEl.scrollTop / max : 0);
+      setActive(Math.round((max > 0 ? scrollEl.scrollTop / max : 0) * (PAGES - 1)));
     };
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
     return () => scrollEl.removeEventListener('scroll', onScroll);
@@ -32,22 +31,22 @@ export default function Navbar({ onNavigate }) {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-neon-cyan/25 bg-void/80 shadow-[0_0_30px_-10px_rgba(46,230,214,0.5)] backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-neon-cyan/30 bg-void/85 shadow-[0_0_30px_-10px_rgba(46,230,214,0.5)] backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <button
           onClick={() => go(0)}
-          className="cursor-pointer font-display text-2xl font-bold tracking-[0.3em] text-fg [text-shadow:0_0_12px_rgba(46,230,214,0.8)]"
+          className="font-display text-2xl font-bold tracking-[0.3em] text-white [text-shadow:0_0_14px_#2ee6d6] cursor-pointer"
           aria-label="Kembali ke awal"
         >
           VNS
         </button>
 
-        <ul className="hidden items-center gap-8 font-sans text-sm font-medium text-fg/80 md:flex">
+        <ul className="hidden items-center gap-8 font-sans text-sm text-white/80 md:flex">
           {LINKS.slice(0, -1).map((l) => (
             <li key={l.label}>
               <button
                 onClick={() => go(l.page)}
-                className={`cursor-pointer border-b pb-1 transition-colors hover:text-fg ${
+                className={`cursor-pointer pb-1 transition-colors hover:text-white border-b ${
                   active === l.page ? 'border-neon-cyan text-neon-cyan' : 'border-transparent'
                 }`}
               >
@@ -66,18 +65,18 @@ export default function Navbar({ onNavigate }) {
         </ul>
 
         <button
-          className="flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5 md:hidden"
+          className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden cursor-pointer"
           onClick={() => setOpen((v) => !v)}
           aria-label="Buka menu"
           aria-expanded={open}
         >
-          <span className={`h-px w-6 bg-fg transition ${open ? 'translate-y-[3.5px] rotate-45' : ''}`} />
-          <span className={`h-px w-6 bg-fg transition ${open ? '-translate-y-[3.5px] -rotate-45' : ''}`} />
+          <span className={`h-px w-6 bg-white transition ${open ? 'translate-y-[3.5px] rotate-45' : ''}`} />
+          <span className={`h-px w-6 bg-white transition ${open ? '-translate-y-[3.5px] -rotate-45' : ''}`} />
         </button>
       </nav>
 
       {open && (
-        <ul className="border-t border-neon-cyan/20 bg-void/95 px-6 py-4 font-sans text-fg/80 md:hidden">
+        <ul className="border-t border-neon-cyan/20 bg-void/95 px-6 py-4 font-sans text-white/80 md:hidden">
           {LINKS.map((l) => (
             <li key={l.label}>
               <button

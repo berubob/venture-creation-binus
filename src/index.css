@@ -4,11 +4,10 @@
 @theme {
   --font-display: 'Chakra Petch', system-ui, sans-serif;
   --font-sans: 'Jost', system-ui, sans-serif;
-  /* Palet neon malam: void navy, panel, teks lavender-putih, tiga warna neon */
   --color-void: #050816;
   --color-deep: #0d1230;
   --color-fg: #e6eaff;
-  --color-dim: #9aa5d8;
+  --color-dim: #a9b4e6;
   --color-neon-cyan: #2ee6d6;
   --color-neon-pink: #ff3ea5;
   --color-neon-violet: #9b6bff;
@@ -38,12 +37,36 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
-/* Satu momen animasi: garis horizon berdenyut pelan */
 @keyframes horizon-pulse {
   0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }
 }
 .horizon-pulse { animation: horizon-pulse 4s ease-in-out infinite; }
+
+/* Papan neon dan lampu antena yang berkedip */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  41% { opacity: 1; }
+  43% { opacity: 0.25; }
+  45% { opacity: 1; }
+  47% { opacity: 0.4; }
+  49% { opacity: 1; }
+}
+.flicker { animation: flicker 6s linear infinite; }
+
+/* Kendaraan terbang melintas di langit kota */
+@keyframes drift {
+  from { transform: translateX(-12vw); }
+  to { transform: translateX(112vw); }
+}
+.drone {
+  position: absolute;
+  left: 0;
+  width: 7px;
+  height: 3px;
+  border-radius: 9999px;
+  animation: drift linear infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   * {
