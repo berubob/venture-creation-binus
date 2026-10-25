@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-display: 'Chakra Petch', system-ui, sans-serif;
   --font-sans: 'Jost', system-ui, sans-serif;
-  /* Palet kemasan: kertas krem, tinta navy, gold foil */
-  --color-paper: #efe7d8;
-  --color-ink: #1b2340;
-  --color-slate-ink: #6b7798;
-  --color-gold: #c9962f;
-  --color-gold-deep: #8a5a14;
+  /* Palet neon malam: void navy, panel, teks lavender-putih, tiga warna neon */
+  --color-void: #050816;
+  --color-deep: #0d1230;
+  --color-fg: #e6eaff;
+  --color-dim: #9aa5d8;
+  --color-neon-cyan: #2ee6d6;
+  --color-neon-pink: #ff3ea5;
+  --color-neon-violet: #9b6bff;
 }
 
 html,
@@ -19,22 +21,29 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #efe7d8;
+  background-color: #050816;
   overflow: hidden;
 }
 
 body {
-  font-family: 'Playfair Display', Georgia, serif;
-  color: #1b2340;
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  color: #e6eaff;
   -webkit-font-smoothing: antialiased;
 }
 
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 2px solid #8a5a14;
+  outline: 2px solid #2ee6d6;
   outline-offset: 3px;
 }
+
+/* Satu momen animasi: garis horizon berdenyut pelan */
+@keyframes horizon-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+.horizon-pulse { animation: horizon-pulse 4s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   * {
