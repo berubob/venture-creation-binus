@@ -43,7 +43,7 @@ export default function CartDrawer() {
   const href = ready ? buildWhatsAppUrl(lines, { name }) : undefined;
 
   return (
-    <div className="fixed inset-0 z-[70]" role="dialog" aria-modal="true" aria-label="Keranjang">
+    <div className="fixed inset-0 z-70" role="dialog" aria-modal="true" aria-label="Keranjang">
       <div className="absolute inset-0 bg-black/45" onClick={closeCart} />
 
       <aside className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-paper text-ink shadow-2xl">

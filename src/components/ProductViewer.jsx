@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ContactShadows, Environment, Html, OrbitControls, useGLTF } from '@react-three/drei';
 import { buildVariant, makeLiquidMaterial, prepareBody, setReveal } from '../modelUtils';
+import { DPR, SHADOW_RES } from '../perf';
 
 const TARGET = 2.6; // sisi terpanjang model dinormalkan ke ukuran ini
 const NONE = [];
@@ -29,6 +30,7 @@ function Fitted({ url, body, liquid }) {
       if (o.material) o.material = o.material.clone();
       if (bodyMats.length && o.name === 'Label_Text') {
         o.renderOrder = 3;
+        o.material.transparent = true; // masuk pass transparan, supaya renderOrder berlaku terhadap badan
         o.material.depthWrite = false;
       }
     });
@@ -121,7 +123,7 @@ class ModelBoundary extends Component {
 
 export default function ProductViewer({ url, body = NONE, liquid = null, items = null, light }) {
   return (
-    <Canvas dpr={[1, 2]} camera={{ position: [0, 0.6, 6.5], fov: 35 }}>
+    <Canvas dpr={DPR} camera={{ position: [0, 0.6, 6.5], fov: 35 }}>
       <ambientLight intensity={0.7} />
       <directionalLight position={[4, 6, 5]} intensity={1.6} />
       <directionalLight position={[-4, 3, -4]} intensity={light.rimIntensity} color={light.rim} />
@@ -132,7 +134,7 @@ export default function ProductViewer({ url, body = NONE, liquid = null, items =
           {items ? <IngredientShowcase url={url} items={items} /> : <Fitted url={url} body={body} liquid={liquid} />}
         </Suspense>
       </ModelBoundary>
-      <ContactShadows position={[0, -1.5, 0]} opacity={light.shadowOpacity} scale={8} blur={2.4} far={4} color={light.shadow} />
+      <ContactShadows position={[0, -1.5, 0]} opacity={light.shadowOpacity} scale={8} blur={2.4} far={4} resolution={SHADOW_RES} color={light.shadow} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}

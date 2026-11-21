@@ -50,7 +50,7 @@ export default function Shop() {
   return (
     <div
       data-theme={product.id}
-      className="fixed inset-0 z-[60] overflow-y-auto bg-paper bg-cover bg-center text-ink"
+      className="fixed inset-0 z-60 overflow-y-auto bg-paper bg-cover bg-center text-ink"
       style={{ backgroundImage: `url(${variant.bg.base})` }}
       role="dialog"
       aria-modal="true"
