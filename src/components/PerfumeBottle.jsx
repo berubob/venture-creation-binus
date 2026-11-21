@@ -6,12 +6,14 @@ import IngredientCloud from './IngredientCloud';
 import { makeLiquidMaterial, prepareBody, setReveal } from '../modelUtils';
 import { DEFAULT_VARIANT, getVariant } from '../data/variants';
 
+// Varian bawaan diunduh lebih awal. Varian lain diunduh saat kursor di atas tombolnya di navbar.
 useGLTF.preload(getVariant(DEFAULT_VARIANT).model);
 useGLTF.preload(getVariant(DEFAULT_VARIANT).ingredientsModel);
 
 const { lerp, damp, clamp } = THREE.MathUtils;
 const smooth = (t) => t * t * (3 - 2 * t);
 
+// Posisi, tinggi, dan skala botol per halaman: hero, tiap bahan, lalu halaman pemesanan
 function makeTargets(n, hero) {
   const each = Array.from({ length: n });
   return {
@@ -28,18 +30,25 @@ function makeTargets(n, hero) {
   };
 }
 
+// Skala model untuk botol dan kotak (proporsi sama seperti di GLB)
 const S = 2;
 
+// Estimasi layout hero di mobile (px CSS): tinggi navbar, dan tinggi blok teks + padding bawah
 const NAV_H = 76;
 const HERO_TEXT_H = 380;
 
+// ---- Pengaturan tutup botol (satuan GLB, sebelum dikali S) ----
 const CAP_LIFT = 0.34; // tinggi tutup terangkat saat ingredient aktif
 const CAP_TILT = 0.2; // kemiringan (radian)
 const CAP_TWIST = 1.1; // putaran seperti dibuka (radian)
 
+// Sudut kotak terhadap sumbu Y (menyerong 45 derajat).
 const BOX_YAW = Math.PI / 4;
 const BOX_X = -2.4;
 
+// GLB: node 'Bottle' (Bottle_Body, Bottle_Liquid, Bottle_Collar, Bottle_Cap > Bottle_Nozzle, Label_Text)
+// dan node 'Carton' (Carton_Body, Carton_Top, Carton_Bottom). Pivot botol di dasar-tengah.
+// Botol tetap hitam. Cairan berwarna sesuai varian (Yisery oranye, Midbel bening) dan baru terlihat saat botol disorot.
 function buildBottle(scene, variant) {
   const root = scene.getObjectByName('Bottle').clone(true);
   const bodyMats = prepareBody(root, variant.bodyNodes);
@@ -56,11 +65,13 @@ function buildBottle(scene, variant) {
     }
   });
 
+  // Cairan: pivot di dasar sehingga scale.y hanya menurunkan permukaan atas
   const liquid = root.getObjectByName('Bottle_Liquid');
   liquid.material = makeLiquidMaterial(variant.liquid);
-  liquid.renderOrder = 1; 
+  liquid.renderOrder = 1; // digambar sebelum badan botol
   liquid.castShadow = false;
 
+  // Tutup: pivot di dasar-tengah, posisi node = posisi tertutup
   const cap = root.getObjectByName('Bottle_Cap');
   const seatY = cap.position.y;
 
@@ -74,7 +85,7 @@ function buildBottle(scene, variant) {
     seatY,
     bodyMats,
     bottom: box3.min.y,
-    top: box3.max.y + CAP_LIFT, 
+    top: box3.max.y + CAP_LIFT, // termasuk tutup saat terangkat
   };
 }
 
@@ -86,6 +97,7 @@ function buildCarton(scene) {
     const m = o.material.clone();
     m.flatShading = false;
     m.side = THREE.DoubleSide;
+    // Tekstur tetap tajam saat dilihat menyerong
     if (m.map) m.map.anisotropy = 8;
     if (m.emissiveMap) m.emissiveMap.anisotropy = 8;
     o.material = m;
@@ -122,6 +134,7 @@ export default function PerfumeBottle({ variant }) {
   const gl = useThree((s) => s.gl);
   const mobile = width < 768;
 
+  // Posisi kursor. Mouse: mengikuti gerak. Sentuhan: hanya saat mengetuk (ketuk botol untuk membuka, ketuk di luar untuk menutup)
   useEffect(() => {
     const dom = gl.domElement;
     const set = (e, on) => {
@@ -145,8 +158,11 @@ export default function PerfumeBottle({ variant }) {
     };
   }, [gl]);
 
+  // Tinggi area pandang pada jarak z = 0
   const viewH = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
 
+  // fit: skala agar botol utuh (dengan tutup terangkat) muat di layar
+  // cy: tinggi tengah botol, supaya pusat rig = pusat botol
   const { fit, cy } = useMemo(() => {
     const h = (bottle.top - bottle.bottom) * S;
     return {
@@ -168,7 +184,9 @@ export default function PerfumeBottle({ variant }) {
 
   const targets = useMemo(() => makeTargets(ingredients.length, mobileHero), [ingredients, mobileHero]);
 
-  useFrame((state, delta) => {
+  useFrame((state, dt) => {
+    // Setelah render sempat berhenti (katalog terbuka), delta pertama bisa sangat besar
+    const delta = Math.min(dt, 0.05);
     const o = scroll.offset;
     const t = state.clock.elapsedTime;
     const { mix, light } = tmp;
@@ -184,6 +202,7 @@ export default function PerfumeBottle({ variant }) {
     const cloud = cloudRigRef.current;
     if (!rig || !spin || !bx || !cloud) return;
 
+    // 1. Posisi dan skala botol
     const targetX = lerp(T.x[i], T.x[i + 1], k);
     const targetY = lerp(T.y[i], T.y[i + 1], k);
     const targetScale = lerp(T.s[i], T.s[i + 1], k) * (mobile ? 1 : fit);
@@ -193,19 +212,23 @@ export default function PerfumeBottle({ variant }) {
     rig.position.y = damp(rig.position.y, targetY + yComp + Math.sin(t * 0.8) * 0.035, 5, delta);
     rig.scale.setScalar(damp(rig.scale.x, targetScale, 5, delta));
 
+    // 1b. Ingredient mengorbit di sekitar botol: pusat dan skalanya mengikuti botol, rotasinya tidak
     cloud.position.x = rig.position.x;
     cloud.position.y = rig.position.y;
     cloud.scale.setScalar(rig.scale.x * (mobile ? 1.1 : 1));
 
+    // 2. Rotasi mengikuti scroll dan pointer
     spin.rotation.y = damp(spin.rotation.y, o * Math.PI * 2 + state.pointer.x * 0.18, 4, delta);
     spin.rotation.x = damp(spin.rotation.x, -state.pointer.y * 0.08, 4, delta);
 
+    // 3. Kotak muncul menjelang akhir (tumbuh dari dasarnya)
     const boxProgress = smooth(clamp(seg - (pages - 2), 0, 1));
     const boxScale = damp(bx.scale.x, boxProgress, 5, delta);
     bx.scale.setScalar(boxScale);
     bx.visible = boxScale > 0.005;
     bx.rotation.y = damp(bx.rotation.y, BOX_YAW + Math.sin(t * 0.35) * 0.035, 3, delta);
 
+    // 4. Bobot ingredient: satu per satu menurut halaman
     let total = 0;
     mix.setRGB(0, 0, 0);
     ingredients.forEach((_, idx) => {
@@ -219,11 +242,13 @@ export default function PerfumeBottle({ variant }) {
       total += w;
     });
 
+    // 5. Cairan: warna tetap sesuai varian, permukaan atas turun saat bahan aktif
     const mixAmt = clamp(total, 0, 1);
     if (total > 1e-4) mix.multiplyScalar(1 / total);
     bottle.liquid.scale.y = damp(bottle.liquid.scale.y, 1 - 0.22 * mixAmt, 4, delta);
     bottle.liquid.rotation.z = Math.sin(t * 0.7) * 0.004;
 
+    // 5b. Hover: badan botol menipis, cairan terlihat
     let hovered = false;
     if (pointer.current.on) {
       ray.setFromCamera(pointer.current, state.camera);
@@ -232,12 +257,14 @@ export default function PerfumeBottle({ variant }) {
     reveal.current = damp(reveal.current, hovered ? 1 : 0, 6, delta);
     setReveal(bottle.bodyMats, reveal.current);
 
+    // 6b. Tutup: duduk di collar saat hero dan halaman kotak, terangkat dan terputar saat ingredient aktif
     capOpen.current = damp(capOpen.current, smooth(mixAmt), 4, delta);
     const open = capOpen.current;
     bottle.cap.position.y = bottle.seatY + CAP_LIFT * open;
     bottle.cap.rotation.z = CAP_TILT * open;
     bottle.cap.rotation.y = CAP_TWIST * open;
 
+    // 7. Cahaya mengikuti warna ingredient
     if (lightRef.current) {
       lightRef.current.color.copy(white).lerp(mix, mixAmt * 0.6);
       lightRef.current.intensity = damp(lightRef.current.intensity, 5 + mixAmt * 7, 4, delta);
@@ -246,6 +273,7 @@ export default function PerfumeBottle({ variant }) {
 
   return (
     <>
+      {/* Produk dan kemasan punya gerakan sendiri */}
       <group ref={rigRef}>
         <pointLight ref={lightRef} position={[0, 0.5, 3.2]} distance={0} decay={2} />
 
@@ -255,6 +283,7 @@ export default function PerfumeBottle({ variant }) {
           </group>
         </group>
 
+        {/* Kotak: dasarnya sejajar dengan dasar botol */}
         <group ref={boxRef} position={[BOX_X, -cy * S, -0.2]} scale={0}>
           <group scale={S}>
             <primitive object={carton} />
@@ -262,6 +291,7 @@ export default function PerfumeBottle({ variant }) {
         </group>
       </group>
 
+      {/* Ingredient bergerak independen dari produk */}
       <group ref={cloudRigRef} rotation={[0, 0, 0.18]}>
         {ingredients.map((ing, idx) => (
           <IngredientCloud
