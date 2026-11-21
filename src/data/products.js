@@ -4,7 +4,7 @@ export const WA_NUMBER = '6281316612997';
 
 export const PICKUP = {
   place: 'Binus Anggrek, Balkon Lt. 3 Table 8',
-  time: '09:00',
+  time: '09:00-11:00',
 };
 
 export const INSTAGRAM_URL =
