@@ -1,22 +1,21 @@
-import { INGREDIENTS } from '../data/ingredients';
+import { INSTAGRAM_URL } from '../data/products';
 
-export default function Footer({ onNavigate }) {
+export default function Footer({ variant, onNavigate }) {
   return (
-    <footer className="border-t-2 border-ink/20 bg-paper-card px-4 pb-3 pt-5 font-sans text-ink sm:px-8 lg:px-10">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-5 lg:grid-cols-4">
-        <div className="col-span-2 lg:col-span-1">
-          <p className="font-serif text-xl font-black tracking-[0.3em] text-ink">VNS</p>
-          <p className="mt-2 hidden max-w-xs text-sm leading-relaxed text-ink-soft lg:block">
-            Eau de parfum dengan tiga lapis aroma: mandarin dan ceri hitam, orange blossom, serta vanila dan amber.
-          </p>
+    <footer className="border-t border-line px-6 pb-4 pt-6 md:px-10">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="col-span-2 md:col-span-1">
+          <p className="font-display text-2xl font-medium tracking-[0.08em]">VNS</p>
+          <p className="mt-1 text-sm text-mute">Jakarta, est. 2026</p>
+          <p className="mt-3 hidden max-w-sm text-sm leading-relaxed text-mute md:block">{variant.footer}</p>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold text-ink">Aroma</p>
-          <ul className="mt-2 space-y-1 text-sm text-ink-soft">
-            {INGREDIENTS.map((ing, i) => (
-              <li key={ing.id}>
-                <button onClick={() => onNavigate(i + 1)} className="cursor-pointer hover:text-gold-deep">
+        <div className="hidden md:block">
+          <p className="text-sm font-bold">Aroma {variant.name}</p>
+          <ul className="mt-2 columns-2 gap-6 space-y-1 text-sm text-mute">
+            {variant.ingredients.map((ing, i) => (
+              <li key={ing.id} className="break-inside-avoid">
+                <button onClick={() => onNavigate(i + 1)} className="cursor-pointer hover:text-gold">
                   {ing.name}
                 </button>
               </li>
@@ -24,39 +23,21 @@ export default function Footer({ onNavigate }) {
           </ul>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold text-ink">Kontak</p>
-          <ul className="mt-2 space-y-1 text-sm text-ink-soft">
-            <li>hello@aura-parfum.id</li>
-            <li>Jakarta, Indonesia</li>
+        <div className="col-span-2 md:col-span-1">
+          <p className="text-sm font-bold">Kontak</p>
+          <ul className="mt-2 space-y-1 text-sm text-mute">
             <li>
-              <a href="#" className="underline hover:text-gold-deep">Instagram</a>
-              {' / '}
-              <a href="#" className="underline hover:text-gold-deep">TikTok</a>
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gold">
+                Instagram @vns.scent
+              </a>
             </li>
+            <li>Pre-order lewat WhatsApp</li>
           </ul>
         </div>
-
-        <form className="hidden lg:block" onSubmit={(e) => e.preventDefault()}>
-          <label htmlFor="aura-email" className="text-sm font-semibold text-ink">
-            Kabar peluncuran
-          </label>
-          <div className="mt-2 flex">
-            <input
-              id="aura-email"
-              type="email"
-              placeholder="Email kamu"
-              className="w-full rounded-l-full border-2 border-ink/60 bg-white px-4 py-2 text-sm text-ink placeholder:text-ink-soft focus:border-gold-deep focus:outline-none"
-            />
-            <button className="cursor-pointer rounded-r-full bg-ink px-4 text-sm font-semibold text-paper hover:bg-gold-deep">
-              Daftar
-            </button>
-          </div>
-        </form>
       </div>
 
-      <div className="mx-auto mt-4 flex max-w-7xl flex-col gap-1 border-t border-ink/20 pt-3 text-xs text-ink-soft lg:flex-row lg:justify-between">
-        <p>&copy; 2026 VNS Parfum. Seluruh hak cipta dilindungi.</p>
+      <div className="mx-auto mt-5 flex max-w-7xl flex-col gap-1 border-t border-line pt-3 text-xs text-mute md:flex-row md:justify-between">
+        <p>&copy; 2026 VNS Scent. Seluruh hak cipta dilindungi.</p>
         <p>Proyek Venture Creation, BINUS University</p>
       </div>
     </footer>
