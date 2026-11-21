@@ -51,9 +51,6 @@ export default function InkBackground() {
       <div ref={baseRef} className={`absolute inset-x-0 bottom-[-5%] top-[-5%] ${move}`}>
         {layer('base')}
       </div>
-      <div ref={goldRef} className={`absolute inset-x-0 bottom-[-8%] top-[-8%] ${move}`}>
-        <img src="/bg/ink-gold.webp" alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-      </div>
       <div ref={lineRef} className={`absolute inset-x-0 bottom-[-12%] top-[-12%] ${move}`}>
         {layer('line')}
       </div>
