@@ -78,7 +78,7 @@ export const MIDBEL_INGREDIENTS = [
     id: 'cardamom',
     name: 'Cardamom',
     latin: 'Elettaria cardamomum',
-    note: 'heart',
+    note: 'middle',
     color: '#8a9a4f',
     accent: '#b9c682',
     description:
@@ -104,7 +104,7 @@ export const MIDBEL_INGREDIENTS = [
     id: 'midbel-vanilla',
     name: 'Vanilla',
     latin: 'Vanilla planifolia',
-    note: 'heart',
+    note: 'middle',
     color: '#b8864b',
     accent: '#e9c58a',
     description:

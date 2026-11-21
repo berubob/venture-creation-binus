@@ -7,7 +7,7 @@ const tone = (c) => `color-mix(in srgb, ${c} 52%, var(--c-ink))`;
 
 const BANDS = {
   top: '18,1 23.5,10.5 12.5,10.5',
-  heart: '11.5,12.5 24.5,12.5 29.5,21.5 6.5,21.5',
+  middle: '11.5,12.5 24.5,12.5 29.5,21.5 6.5,21.5',
   base: '5.5,23.5 30.5,23.5 35,31.5 1,31.5',
 };
 
@@ -41,21 +41,21 @@ function IngredientSection({ ing, index }) {
 
   return (
     <section
-      className={`flex h-screen items-end px-6 pb-14 md:items-center md:px-24 md:pb-0 ${
+      className={`flex h-screen items-end px-6 pb-6 md:items-center md:px-24 md:pb-0 ${
         textRight ? 'md:justify-end' : 'md:justify-start'
       }`}
     >
       <article className="w-full max-w-lg">
         <NotePyramid note={ing.note} color={color} />
 
-        <h2 className="mt-5 font-display text-[clamp(3.25rem,8vw,6.5rem)] font-medium leading-[0.95] tracking-tight" style={{ color }}>
+        <h2 className="mt-3 font-display text-[clamp(2.5rem,8vw,6.5rem)] md:mt-5 font-medium leading-[0.95] tracking-tight" style={{ color }}>
           {ing.name}
         </h2>
         <p className="mt-2 font-display text-lg italic text-mute">{ing.latin}</p>
 
-        <p className="mt-6 max-w-[46ch] text-[0.95rem] leading-relaxed md:text-base">{ing.description}</p>
+        <p className="mt-4 max-w-[46ch] text-sm leading-relaxed md:mt-6 md:text-base">{ing.description}</p>
 
-        <dl className="mt-7 grid grid-cols-[5.5rem_1fr] gap-x-4 gap-y-2 text-sm">
+        <dl className="mt-4 grid grid-cols-[5.5rem_1fr] gap-x-4 gap-y-1.5 text-sm md:mt-7 md:gap-y-2">
           {ing.facts.map((f) => (
             <div key={f.label} className="contents">
               <dt className="text-mute">{f.label}</dt>

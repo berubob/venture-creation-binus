@@ -1,4 +1,3 @@
-
 const pod = (n) => [
   ...[1, 2, 3, 4, 5, 6].map((i) => `vanilla_pod_${n}_segment_${i}`),
   ...[1, 2, 3, 4, 5].map((i) => `vanilla_pod_${n}_joint_${i}`),
@@ -41,7 +40,7 @@ export const INGREDIENTS = [
     color: '#a3122f',
     accent: '#ff6b81',
     description:
-      'Aroma ceri dalam parfum hampir selalu dibangun sebagai akord, karena buahnya tidak menghasilkan minyak yang bisa diekstraksi langsung. Hasilnya tidak sekadar manis: ada sisi asam yang segar dan sentuhan almond. Di AURA, ceri hitam membawa karakter ceria ala kebun ceri musim panas.',
+      'Aroma ceri dalam parfum hampir selalu dibangun sebagai akord, karena buahnya tidak menghasilkan minyak yang bisa diekstraksi langsung. Hasilnya tidak sekadar manis: ada sisi asam yang segar dan sentuhan almond. Di VNS, ceri hitam membawa karakter ceria ala kebun ceri musim panas.',
     facts: [
       { label: 'Asal', value: 'Inspirasi kebun ceri' },
       { label: 'Ekstraksi', value: 'Akord, dirakit dari aroma buah' },
@@ -61,7 +60,7 @@ export const INGREDIENTS = [
     id: 'orange-blossom',
     name: 'Orange Blossom',
     latin: 'Citrus aurantium (bunga)',
-    note: 'heart',
+    note: 'middle',
     color: '#f3e6c4',
     accent: '#fff0c9',
     description:
@@ -135,6 +134,6 @@ export const PAGES = INGREDIENTS.length + 2;
 
 export const NOTE_LEVELS = [
   { key: 'top', label: 'Top' },
-  { key: 'heart', label: 'Heart' },
+  { key: 'middle', label: 'Middle' },
   { key: 'base', label: 'Base' },
 ];

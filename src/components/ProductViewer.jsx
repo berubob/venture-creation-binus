@@ -2,7 +2,7 @@ import { Component, Suspense, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ContactShadows, Environment, Html, OrbitControls, useGLTF } from '@react-three/drei';
-import { buildVariant, makeLiquidMaterial, prepareBody, setReveal } from '../modelUtils';
+import { addMiniLiquid, buildVariant, makeLiquidMaterial, prepareBody, setReveal } from '../modelUtils';
 import { DPR, SHADOW_RES } from '../perf';
 
 const TARGET = 2.6; // sisi terpanjang model dinormalkan ke ukuran ini
@@ -34,6 +34,9 @@ function Fitted({ url, body, liquid }) {
         o.material.depthWrite = false;
       }
     });
+    // Travel size 3 ml: model tidak punya cairan, jadi dibuat otomatis
+    if (liquid && !obj.getObjectByName('Bottle_Liquid')) addMiniLiquid(obj, liquid);
+
     const box = new THREE.Box3().setFromObject(obj);
     const size = box.getSize(new THREE.Vector3());
     return {
