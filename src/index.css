@@ -30,7 +30,10 @@
   --c-gold: #cdb184;
 }
 
-html,
+html {
+  color-scheme: only light;
+}
+
 body,
 #root {
   margin: 0;
