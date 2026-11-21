@@ -1,8 +1,4 @@
-// Komposisi AURA terinspirasi dari dua parfum:
-// YSL Libre Intense  : tangerine, bergamot, lavender / jasmine sambac, orange blossom, orchid / tonka, vanilla, ambergris, vetiver
-// Escada Cherry in the Air : black cherry, raspberry, mandarin / gardenia, orchid, vanilla, marshmallow / sandalwood, oak, musk
 
-// Nama node di aura_ingredients_3d.glb
 const pod = (n) => [
   ...[1, 2, 3, 4, 5, 6].map((i) => `vanilla_pod_${n}_segment_${i}`),
   ...[1, 2, 3, 4, 5].map((i) => `vanilla_pod_${n}_joint_${i}`),

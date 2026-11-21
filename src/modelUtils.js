@@ -1,15 +1,15 @@
 import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-// File GLB dari Blender/generator ini hanya membawa POSITION (tanpa normal),
-// jadi normal dihitung ulang di sini. flat = true -> sisi tegas (kristal, kotak).
 export function prepGeometry(source, flat) {
   let g = source.clone();
+  const keepNormal = !flat && !!g.attributes.normal;
   Object.keys(g.attributes).forEach((k) => {
-    if (k !== 'position') g.deleteAttribute(k);
+    if (k !== 'position' && !(k === 'normal' && keepNormal)) g.deleteAttribute(k);
   });
   if (flat) g = g.toNonIndexed();
-  g.computeVertexNormals();
+  if (!keepNormal) g.computeVertexNormals();
   return g;
 }
 
@@ -18,14 +18,64 @@ export function findMesh(scene, name) {
   return m && m.isMesh ? m : null;
 }
 
-// Gabungkan beberapa node menjadi satu geometri per material, dipusatkan
-// di (0,0,0) dan diskalakan agar sisi terpanjangnya = 1. Siap untuk InstancedMesh.
+export function makeLiquidMaterial(cfg) {
+  const color = new THREE.Color(cfg.color);
+  if (cfg.clear) {
+    return new THREE.MeshPhysicalMaterial({
+      color,
+      transparent: true,
+      opacity: 0.3,
+      roughness: 0.02,
+      metalness: 0,
+      clearcoat: 1,
+      clearcoatRoughness: 0.02,
+      envMapIntensity: 1.6,
+      depthWrite: false,
+    });
+  }
+  return new THREE.MeshPhysicalMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: cfg.emissive ?? 0.35,
+    roughness: 0.15,
+    clearcoat: 0.6,
+  });
+}
+
+export function prepareBody(root, names) {
+  const mats = [];
+  root.traverse((o) => {
+    if (!o.isMesh || !names.includes(o.name)) return;
+    o.material = o.material.clone();
+    o.material.transparent = true;
+    o.material.depthWrite = true;
+    o.renderOrder = 2;
+    mats.push(o.material);
+  });
+  return mats;
+}
+
+export function setReveal(mats, r) {
+  const opacity = THREE.MathUtils.lerp(1, 0.1, r);
+  mats.forEach((m) => {
+    m.opacity = opacity;
+  });
+}
+
+export function preloadVariant(variant) {
+  useGLTF.preload(variant.model);
+  useGLTF.preload(variant.ingredientsModel);
+}
+
 export function buildVariant(scene, names, { flat = false, glow } = {}) {
   scene.updateMatrixWorld(true);
   const byMat = new Map();
   names.forEach((name) => {
     const src = findMesh(scene, name);
-    if (!src) return;
+    if (!src) {
+      console.warn(`[buildVariant] node tidak ditemukan atau bukan mesh: ${name}`);
+      return;
+    }
     const g = prepGeometry(src.geometry, flat);
     g.applyMatrix4(src.matrixWorld);
     if (!byMat.has(src.material)) byMat.set(src.material, []);
@@ -45,7 +95,9 @@ export function buildVariant(scene, names, { flat = false, glow } = {}) {
 
   const parts = [];
   byMat.forEach((list, mat) => {
-    const merged = mergeGeometries(list, false);
+    const mixed = list.some((g) => g.index) && !list.every((g) => g.index);
+    const merged = mergeGeometries(mixed ? list.map((g) => (g.index ? g.toNonIndexed() : g)) : list, false);
+    if (!merged) return;
     merged.translate(-center.x, -center.y, -center.z);
     merged.scale(k, k, k);
     const material = mat.clone();
@@ -59,8 +111,6 @@ export function buildVariant(scene, names, { flat = false, glow } = {}) {
   return parts;
 }
 
-// Salin node-node bernama menjadi Group baru (geometri sudah di koordinat dunia).
-// override(name, materialAsli, flat) -> material pengganti.
 export function bakeGroup(scene, names, override) {
   scene.updateMatrixWorld(true);
   const group = new THREE.Group();

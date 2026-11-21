@@ -1,63 +1,91 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, Sparkles, Stats, Loader } from '@react-three/drei';
+import { Environment, ScrollControls, Scroll, ContactShadows, useScroll, useProgress } from '@react-three/drei';
 import PerfumeBottle from './components/PerfumeBottle';
 import Overlay from './components/Overlay';
 import Navbar from './components/Navbar';
 import InkBackground from './components/InkBackground';
-import { PAGES } from './data/ingredients';
-import { setScrollEl, scrollToPage, bindPointer } from './scrollStore';
+import Shop from './components/Shop';
+import CartDrawer from './components/CartDrawer';
+import { getVariant } from './data/variants';
+import { useStore } from './cartStore';
+import { setScrollEl, scrollToPage } from './scrollStore';
 
-const goTo = (page) => scrollToPage(page, PAGES);
+function ScrollBridge() {
+  const scroll = useScroll();
+  useEffect(() => {
+    setScrollEl(scroll.el);
+    return () => setScrollEl(null);
+  }, [scroll.el]);
+  return null;
+}
 
-const SHOW_STATS = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('stats');
-
-function onCreated({ gl }) {
-  const canvas = gl.domElement;
-  canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
+function LoadingBadge() {
+  const { active, progress } = useProgress();
+  if (!active) return null;
+  return (
+    <div
+      role="status"
+      className="pointer-events-none fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-full bg-ink px-5 py-2 text-xs font-bold text-paper"
+    >
+      Memuat model {Math.round(progress)}%
+    </div>
+  );
 }
 
 export default function App() {
-  useEffect(() => bindPointer(), []);
+  const shopOpen = useStore((s) => s.shopOpen);
+  const variant = getVariant(useStore((s) => s.variant));
+  const { light } = variant;
+  const goTo = (page) => scrollToPage(page, variant.pages);
 
   return (
-    <div className="relative h-dvh w-screen overflow-hidden bg-paper">
+    <div data-theme={variant.id} className="relative h-screen w-screen overflow-hidden bg-paper font-sans text-ink">
       <InkBackground />
-
-      <Canvas
-        style={{ position: 'fixed', inset: 0, zIndex: 10, pointerEvents: 'none' }}
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 7], fov: 45 }}
-        gl={{ powerPreference: 'high-performance', stencil: false }}
-        onCreated={onCreated}
-      >
-        {SHOW_STATS && <Stats />}
-
-        <ambientLight intensity={0.6} />
-        <spotLight position={[5, 10, 5]} angle={0.15} penumbra={1} intensity={2} />
-        <Environment preset="studio" />
-
-        <PerfumeBottle />
-        <Sparkles count={40} scale={[12, 8, 4]} size={3} speed={0.3} color="#c9962f" />
-      </Canvas>
-
       <Navbar onNavigate={goTo} />
 
-      <main
-        ref={setScrollEl}
-        className="fixed inset-0 z-20 overflow-y-auto overscroll-none"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#8a5a14 transparent' }}
-      >
-        <Overlay onNavigate={goTo} />
-      </main>
+      {/* Canvas transparan, di atas latar */}
+      <div className="absolute inset-0 z-10">
+        <Canvas
+          shadows
+          dpr={[1, 2]}
+          camera={{ position: [0, 0, 7], fov: 45 }}
+          frameloop={shopOpen ? 'never' : 'always'}
+        >
+          <ambientLight intensity={0.6} />
+          <spotLight position={[5, 10, 5]} angle={0.15} penumbra={1} intensity={2} castShadow />
+          {/* Cahaya dari belakang supaya siluet botol hitam tetap terbaca, terutama di latar gelap */}
+          <directionalLight position={[-4, 3, -4]} intensity={light.rimIntensity} color={light.rim} />
+          <directionalLight position={[4, 2, -4]} intensity={light.rimIntensity * 0.6} color={light.rim} />
+          <Environment preset="studio" environmentIntensity={light.env} />
 
-      <Loader
-        containerStyles={{ background: '#efe7d8', zIndex: 100 }}
-        innerStyles={{ background: 'rgba(27,35,64,0.15)', width: 240 }}
-        barStyles={{ background: '#8a5a14', height: 3 }}
-        dataStyles={{ color: '#1b2340', fontSize: 14, fontFamily: 'Jost, system-ui, sans-serif' }}
-        dataInterpolation={(p) => `Memuat ${p.toFixed(0)}%`}
-      />
+          {/* key = varian: pindah parfum memuat ulang seluruh cerita dari halaman pertama */}
+          <ScrollControls key={variant.id} pages={variant.pages} damping={0.2}>
+            <ScrollBridge />
+
+            <Suspense fallback={null}>
+              <PerfumeBottle key={variant.id} variant={variant} />
+            </Suspense>
+
+            <ContactShadows
+              position={[0, -1.5, 0]}
+              opacity={light.shadowOpacity}
+              scale={10}
+              blur={2.4}
+              far={4}
+              color={light.shadow}
+            />
+
+            <Scroll html style={{ width: '100%' }}>
+              <Overlay variant={variant} onNavigate={goTo} />
+            </Scroll>
+          </ScrollControls>
+        </Canvas>
+      </div>
+
+      <LoadingBadge />
+      <Shop />
+      <CartDrawer />
     </div>
   );
 }
