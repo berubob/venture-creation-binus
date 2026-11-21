@@ -40,7 +40,8 @@ export default function Shop() {
   const variant = getVariant(product.id);
   const size = getSize(sizeId);
   const url = view === 'ingredients' ? product.models.ingredients : product.models[sizeId];
-  const bottle15 = view === 'bottle' && sizeId === '15ml';
+  const bottleView = view === 'bottle';
+  const bottle15 = bottleView && sizeId === '15ml';
 
   const add = () => {
     addItem(product.id, size.id, qty);
@@ -83,7 +84,7 @@ export default function Shop() {
             <ProductViewer
               url={url}
               body={bottle15 ? variant.bodyNodes : NO_BODY}
-              liquid={bottle15 ? variant.liquid : null}
+              liquid={bottleView ? variant.liquid : null}
               items={view === 'ingredients' ? variant.ingredients : null}
               light={variant.light}
             />

@@ -42,6 +42,29 @@ export function makeLiquidMaterial(cfg) {
   });
 }
 
+// Model travel size (3 ml) tidak punya node Bottle_Liquid, jadi cairannya dibuat di sini:
+// silinder di dalam Bottle_Body, mengikuti ukuran badan botol (dinding bagian dalam sekitar 86% radius luar).
+// Memakai material yang sama dengan botol 15 ml (makeLiquidMaterial), jadi Yisery oranye dan Midbel bening.
+export function addMiniLiquid(root, cfg, { bodyName = 'Bottle_Body', fill = 0.74 } = {}) {
+  const body = findMesh(root, bodyName);
+  if (!body) return null;
+  root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(body);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const radius = (Math.min(size.x, size.z) / 2) * 0.82;
+  const bottom = box.min.y + size.y * 0.035; // di atas lantai kaca
+  const height = size.y * fill;
+
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 48), makeLiquidMaterial(cfg));
+  mesh.name = 'Bottle_Liquid';
+  mesh.position.set(center.x, bottom + height / 2, center.z);
+  mesh.renderOrder = 1;
+  mesh.castShadow = false;
+  body.parent.add(mesh);
+  return mesh;
+}
+
 export function prepareBody(root, names) {
   const mats = [];
   root.traverse((o) => {
