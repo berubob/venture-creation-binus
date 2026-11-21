@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PAYMENT, PICKUP, buildWhatsAppUrl, formatRupiah, getProduct, getSize } from '../data/products';
-import { clearCart, closeCart, removeItem, setQty, useStore } from '../cartStore';
+import { clearCart, closeCart, fitCartToStock, removeItem, setQty, useStore } from '../cartStore';
+import { useStockMap } from '../stockStore';
 
 const fieldCls =
   'mt-1 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-sm text-ink placeholder:text-mute/70 focus:border-gold focus:outline-none';
@@ -8,6 +9,7 @@ const fieldCls =
 export default function CartDrawer() {
   const open = useStore((s) => s.cartOpen);
   const items = useStore((s) => s.items);
+  const stockMap = useStockMap();
   const [name, setName] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -35,12 +37,27 @@ export default function CartDrawer() {
     }
   };
 
+  // stock: null = belum diketahui (tidak membatasi). issue = pesan kalau baris ini melebihi stok.
   const lines = items
     .map((it) => ({ ...it, product: getProduct(it.productId), size: getSize(it.sizeId) }))
-    .filter((l) => l.product && l.size);
+    .filter((l) => l.product && l.size)
+    .map((l) => {
+      const stock = stockMap[`${l.productId}:${l.sizeId}`] ?? null;
+      const issue =
+        stock === 0 ? 'Stok habis' : stock != null && l.qty > stock ? `Stok tersisa ${stock}` : null;
+      return { ...l, stock, issue };
+    });
+
   const total = lines.reduce((sum, l) => sum + l.size.price * l.qty, 0);
-  const ready = lines.length > 0 && name.trim().length > 0;
+  const hasIssue = lines.some((l) => l.issue);
+  const ready = lines.length > 0 && name.trim().length > 0 && !hasIssue;
   const href = ready ? buildWhatsAppUrl(lines, { name }) : undefined;
+
+  const hint = hasIssue
+    ? 'Ada barang yang melebihi stok. Sesuaikan keranjang dulu.'
+    : ready
+      ? 'Pesan sudah tertulis di WhatsApp, tinggal kirim.'
+      : 'Isi nama dulu untuk melanjutkan.';
 
   return (
     <div className="fixed inset-0 z-70" role="dialog" aria-modal="true" aria-label="Keranjang">
@@ -67,39 +84,51 @@ export default function CartDrawer() {
             </div>
           ) : (
             <ul className="border-t border-line">
-              {lines.map((l) => (
-                <li key={l.key} className="flex gap-4 border-b border-line py-4">
-                  <div className="flex-1">
-                    <p className="font-display text-xl leading-tight">{l.product.name}</p>
-                    <p className="text-xs text-mute">
-                      {l.size.label}, {l.size.volume}. {formatRupiah(l.size.price)} per botol
-                    </p>
-                    <div className="mt-2 flex items-center gap-4 text-sm">
-                      <div className="flex items-center">
+              {lines.map((l) => {
+                const atMax = l.stock != null && l.qty >= l.stock;
+                return (
+                  <li key={l.key} className="flex gap-4 border-b border-line py-4">
+                    <div className="flex-1">
+                      <p className="font-display text-xl leading-tight">{l.product.name}</p>
+                      <p className="text-xs text-mute">
+                        {l.size.label}, {l.size.volume}. {formatRupiah(l.size.price)} per botol
+                      </p>
+                      <div className="mt-2 flex items-center gap-4 text-sm">
+                        <div className="flex items-center">
+                          <button
+                            onClick={() => setQty(l.key, l.qty - 1)}
+                            className="h-8 w-8 cursor-pointer rounded-full hover:bg-ink/5"
+                            aria-label={`Kurangi ${l.product.name} ${l.size.volume}`}
+                          >
+                            −
+                          </button>
+                          <span className="w-6 text-center font-bold">{l.qty}</span>
+                          <button
+                            onClick={() => setQty(l.key, l.qty + 1)}
+                            disabled={atMax}
+                            className="h-8 w-8 cursor-pointer rounded-full hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-30"
+                            aria-label={`Tambah ${l.product.name} ${l.size.volume}`}
+                          >
+                            +
+                          </button>
+                        </div>
                         <button
-                          onClick={() => setQty(l.key, l.qty - 1)}
-                          className="h-8 w-8 cursor-pointer rounded-full hover:bg-ink/5"
-                          aria-label={`Kurangi ${l.product.name} ${l.size.volume}`}
+                          onClick={() => removeItem(l.key)}
+                          className="cursor-pointer text-xs text-mute underline hover:text-gold"
                         >
-                          −
-                        </button>
-                        <span className="w-6 text-center font-bold">{l.qty}</span>
-                        <button
-                          onClick={() => setQty(l.key, l.qty + 1)}
-                          className="h-8 w-8 cursor-pointer rounded-full hover:bg-ink/5"
-                          aria-label={`Tambah ${l.product.name} ${l.size.volume}`}
-                        >
-                          +
+                          Hapus
                         </button>
                       </div>
-                      <button onClick={() => removeItem(l.key)} className="cursor-pointer text-xs text-mute underline hover:text-gold">
-                        Hapus
-                      </button>
+                      {l.issue ? (
+                        <p className="mt-2 text-xs font-bold text-gold">{l.issue}</p>
+                      ) : (
+                        atMax && <p className="mt-2 text-xs text-mute">Batas stok tercapai</p>
+                      )}
                     </div>
-                  </div>
-                  <p className="font-display text-xl">{formatRupiah(l.size.price * l.qty)}</p>
-                </li>
-              ))}
+                    <p className="font-display text-xl">{formatRupiah(l.size.price * l.qty)}</p>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
@@ -152,9 +181,17 @@ export default function CartDrawer() {
             >
               Pre-order lewat WhatsApp
             </a>
-            <p className="mt-2 text-center text-xs text-mute">
-              {ready ? 'Pesan sudah tertulis di WhatsApp, tinggal kirim.' : 'Isi nama dulu untuk melanjutkan.'}
+            <p className="mt-2 text-center text-xs text-mute" aria-live="polite">
+              {hint}
             </p>
+            {hasIssue && (
+              <button
+                onClick={fitCartToStock}
+                className="mx-auto mt-2 block cursor-pointer border-b border-ink pb-0.5 text-xs font-bold hover:border-gold hover:text-gold"
+              >
+                Sesuaikan keranjang dengan stok
+              </button>
+            )}
 
             <div className="mt-3 flex justify-between text-xs text-mute">
               <button onClick={closeCart} className="cursor-pointer underline hover:text-gold">

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, ScrollControls, Scroll, ContactShadows, useScroll, useProgress } from '@react-three/drei';
 import PerfumeBottle from './components/PerfumeBottle';
@@ -12,11 +12,15 @@ import { closeShop, openShop, useStore } from './cartStore';
 import { setScrollEl, scrollToPage } from './scrollStore';
 import { DPR, LITE, SHADOW_RES } from './perf';
 
+// Halaman admin stok dimuat terpisah (lazy), jadi pengunjung biasa tidak mengunduh kodenya
+const Admin = lazy(() => import('./components/Admin'));
+
 // Katalog adalah halaman terpisah (#/pesan). Selama katalog terbuka, halaman utama (Canvas 3D dan isinya)
 // dilepas penuh, jadi hanya ada satu WebGL context. Kembali ke halaman utama = muat ulang halaman,
 // seperti refresh. Isi keranjang dan pilihan parfum tetap aman karena disimpan di localStorage.
 // Ubah ke false untuk hanya memasang ulang halaman utama tanpa reload.
 const SHOP_HASH = '#/pesan';
+const ADMIN_HASH = '#/admin';
 const RELOAD_ON_RETURN = true;
 
 function useShopPage() {
@@ -125,7 +129,8 @@ function Home({ variant }) {
   );
 }
 
-export default function App() {
+// Toko publik (isi App yang lama)
+function Storefront() {
   const shopOpen = useShopPage();
   const variant = getVariant(useStore((s) => s.variant));
 
@@ -136,4 +141,28 @@ export default function App() {
       <CartDrawer />
     </div>
   );
+}
+
+// Memilih halaman berdasarkan URL: #/admin = admin stok, selain itu = toko.
+// Dipisah dari Storefront supaya hooks di Storefront tidak dipanggil bersyarat.
+export default function App() {
+  const [isAdmin] = useState(() => window.location.hash === ADMIN_HASH);
+
+  // Kalau hash berpindah antara toko dan admin tanpa reload, muat ulang supaya halaman yang benar tampil
+  useEffect(() => {
+    const onHash = () => {
+      if ((window.location.hash === ADMIN_HASH) !== isAdmin) window.location.reload();
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [isAdmin]);
+
+  if (isAdmin) {
+    return (
+      <Suspense fallback={null}>
+        <Admin />
+      </Suspense>
+    );
+  }
+  return <Storefront />;
 }

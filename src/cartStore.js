@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { DEFAULT_VARIANT, VARIANTS } from './data/variants';
+import { getStock } from './stockStore';
 
 const KEY = 'vns-cart-v1';
 const VARIANT_KEY = 'vns-variant-v1';
@@ -66,18 +67,42 @@ export function setVariant(id) {
   set({ variant: id, shopProduct: id });
 }
 
+// Batas jumlah satu baris: stok di database (kalau diketahui), maksimal 99.
+const cap = (productId, sizeId) => {
+  const stock = getStock(productId, sizeId);
+  return stock == null ? 99 : Math.min(99, stock);
+};
+
 export function addItem(productId, sizeId, qty = 1) {
   const key = `${productId}:${sizeId}`;
   const found = state.items.find((it) => it.key === key);
+  const current = found?.qty ?? 0;
+  const next = Math.min(cap(productId, sizeId), current + qty);
+  if (next <= 0 || next === current) return; // stok habis atau sudah di batas
   const items = found
-    ? state.items.map((it) => (it.key === key ? { ...it, qty: Math.min(99, it.qty + qty) } : it))
-    : [...state.items, { key, productId, sizeId, qty }];
+    ? state.items.map((it) => (it.key === key ? { ...it, qty: next } : it))
+    : [...state.items, { key, productId, sizeId, qty: next }];
   set({ items });
 }
 
 export function setQty(key, qty) {
   if (qty <= 0) return removeItem(key);
-  set({ items: state.items.map((it) => (it.key === key ? { ...it, qty: Math.min(99, qty) } : it)) });
+  const it = state.items.find((x) => x.key === key);
+  if (!it) return;
+  // Menambah dibatasi stok; mengurangi selalu boleh (termasuk saat stok sudah di bawah isi keranjang)
+  const next = qty > it.qty ? Math.min(qty, Math.max(it.qty, cap(it.productId, it.sizeId))) : qty;
+  if (next === it.qty) return;
+  set({ items: state.items.map((x) => (x.key === key ? { ...x, qty: next } : x)) });
+}
+
+// Dipakai saat stok berubah setelah barang masuk keranjang: turunkan ke stok yang tersedia, hapus yang habis.
+export function fitCartToStock() {
+  const items = state.items.flatMap((it) => {
+    const stock = getStock(it.productId, it.sizeId);
+    if (stock == null || it.qty <= stock) return [it];
+    return stock > 0 ? [{ ...it, qty: stock }] : [];
+  });
+  set({ items });
 }
 
 export const removeItem = (key) => set({ items: state.items.filter((it) => it.key !== key) });
