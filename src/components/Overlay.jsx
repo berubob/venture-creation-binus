@@ -1,7 +1,8 @@
 import { NOTE_LEVELS } from '../data/variants';
-import { SIZES, formatRupiah } from '../data/products';
+import { SIZES } from '../data/products';
 import { openShop } from '../cartStore';
 import Footer from './Footer';
+import Price from './Price';
 
 const tone = (c) => `color-mix(in srgb, ${c} 52%, var(--c-ink))`;
 
@@ -85,7 +86,9 @@ export default function Overlay({ variant, onNavigate }) {
               <dt className="text-mute">
                 {s.label} {s.volume}
               </dt>
-              <dd className="mt-0.5 font-display text-2xl">{formatRupiah(s.price)}</dd>
+              <dd className="mt-0.5">
+                <Price size={s} align="start" className="font-display text-2xl" />
+              </dd>
             </div>
           ))}
         </dl>
@@ -127,7 +130,9 @@ export default function Overlay({ variant, onNavigate }) {
                 <dt className="text-mute">
                   {s.label} {s.volume}
                 </dt>
-                <dd className="mt-0.5 font-display text-2xl">{formatRupiah(s.price)}</dd>
+                <dd className="mt-0.5">
+                  <Price size={s} align="center" className="font-display text-2xl" />
+                </dd>
               </div>
             ))}
           </dl>
