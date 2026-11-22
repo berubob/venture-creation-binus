@@ -10,9 +10,10 @@ export const PICKUP = {
 export const INSTAGRAM_URL =
   'https://www.instagram.com/vns.scent?utm_source=ig_web_button_share_sheet&dmpr=ZDNlZDc0MzIxNw==';
 
+
 export const SIZES = [
-  { id: '15ml', label: 'Small', volume: '15 ml', price: 50000 },
-  { id: '3ml', label: 'Travel size', volume: '3 ml', price: 10000 },
+  { id: '15ml', label: 'Small', volume: '15 ml', price: 59900, normalPrice: 65000 },
+  { id: '3ml', label: 'Travel size', volume: '3 ml', price: 12900, normalPrice: 17000 },
 ];
 
 const SPRAY_3ML = '/models/VNS_Spray_3ml_realsize_m.glb';

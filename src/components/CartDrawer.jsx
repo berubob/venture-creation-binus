@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PAYMENT, PICKUP, buildWhatsAppUrl, formatRupiah, getProduct, getSize } from '../data/products';
 import { clearCart, closeCart, fitCartToStock, removeItem, setQty, useStore } from '../cartStore';
 import { useStockMap } from '../stockStore';
+import Price from './Price';
 
 const fieldCls =
   'mt-1 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-sm text-ink placeholder:text-mute/70 focus:border-gold focus:outline-none';
@@ -49,6 +50,10 @@ export default function CartDrawer() {
     });
 
   const total = lines.reduce((sum, l) => sum + l.size.price * l.qty, 0);
+  const savings = lines.reduce(
+    (sum, l) => sum + Math.max(0, (l.size.normalPrice ?? l.size.price) - l.size.price) * l.qty,
+    0
+  );
   const hasIssue = lines.some((l) => l.issue);
   const ready = lines.length > 0 && name.trim().length > 0 && !hasIssue;
   const href = ready ? buildWhatsAppUrl(lines, { name }) : undefined;
@@ -125,7 +130,7 @@ export default function CartDrawer() {
                         atMax && <p className="mt-2 text-xs text-mute">Batas stok tercapai</p>
                       )}
                     </div>
-                    <p className="font-display text-xl">{formatRupiah(l.size.price * l.qty)}</p>
+                    <Price size={l.size} qty={l.qty} className="font-display text-xl" />
                   </li>
                 );
               })}
@@ -135,6 +140,9 @@ export default function CartDrawer() {
 
         {lines.length > 0 && (
           <div className="px-6 pb-6 pt-4">
+            {savings > 0 && (
+              <p className="mb-1 text-right text-xs text-gold">Hemat {formatRupiah(savings)}</p>
+            )}
             <div className="mb-4 flex items-baseline justify-between">
               <span className="text-mute">Total</span>
               <span className="font-display text-3xl">{formatRupiah(total)}</span>

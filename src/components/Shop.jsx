@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import ProductViewer from './ProductViewer';
 import { getVariant } from '../data/variants';
-import { INSTAGRAM_URL, PRODUCTS, SIZES, formatRupiah, getProduct, getSize } from '../data/products';
+import { INSTAGRAM_URL, PRODUCTS, SIZES, getProduct, getSize } from '../data/products';
 import { addItem, closeShop, openCart, selectProduct, useCartCount, useStore } from '../cartStore';
 import { useStock } from '../stockStore';
+import Price from './Price';
 
 const NO_BODY = []; // referensi tetap supaya model tidak dibuat ulang tiap render
 const LOW_STOCK = 30; // di bawah atau sama dengan ini, tampilkan "Sisa N"
@@ -13,7 +14,7 @@ const tab = (on) =>
     on ? 'border-gold text-ink' : 'border-transparent text-mute hover:text-ink'
   }`;
 
-// Satu baris pilihan ukuran. Stok 0: baris diredupkan, harga dicoret, dan diberi label "Habis".
+// Satu baris pilihan ukuran. Stok 0: baris diredupkan dan diberi label "Habis".
 // Stok null (belum diketahui) tidak menampilkan apa-apa.
 function SizeOption({ size, productId, on, onSelect }) {
   const stock = useStock(productId, size.id);
@@ -40,7 +41,7 @@ function SizeOption({ size, productId, on, onSelect }) {
       </span>
       {out && <span className="text-xs font-bold text-gold">Habis</span>}
       {low && <span className="text-xs text-gold">Sisa {stock}</span>}
-      <span className={`font-display text-2xl ${out ? 'line-through' : ''}`}>{formatRupiah(size.price)}</span>
+      <Price size={size} className="font-display text-2xl" />
     </button>
   );
 }
@@ -205,7 +206,7 @@ export default function Shop() {
                 +
               </button>
             </div>
-            <span className="ml-auto font-display text-2xl">{formatRupiah(size.price * qty)}</span>
+            <Price size={size} qty={qty} className="ml-auto font-display text-2xl" />
           </div>
 
           <button
