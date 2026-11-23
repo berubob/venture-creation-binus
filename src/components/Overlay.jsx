@@ -1,6 +1,6 @@
 import { NOTE_LEVELS } from '../data/variants';
 import { SIZES } from '../data/products';
-import { openShop, openNotes } from '../cartStore';
+import { openNotes, openShop } from '../cartStore';
 import Footer from './Footer';
 import Price from './Price';
 
@@ -74,7 +74,7 @@ export default function Overlay({ variant, onNavigate }) {
     <div className="w-full text-ink">
       {/* Halaman 1: Hero */}
       <section className="relative flex h-screen flex-col justify-end px-6 pb-8 pt-24 md:justify-center md:px-24 md:pb-0">
-        <h1 className="font-display text-[clamp(4.5rem,13vw,11rem)] font-medium leading-[0.88] tracking-tight">
+        <h1 id="hero-title" className="font-display text-[clamp(4.5rem,13vw,11rem)] font-medium leading-[0.88] tracking-tight">
           {variant.name}
         </h1>
         <p className="mt-3 text-sm uppercase tracking-[0.3em] text-gold md:mt-5">{variant.tagline}</p>
@@ -93,7 +93,7 @@ export default function Overlay({ variant, onNavigate }) {
           ))}
         </dl>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-4 md:mt-9">
+        <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 md:mt-9">
           <button
             onClick={() => openShop()}
             className="cursor-pointer rounded-full bg-ink px-8 py-3.5 text-sm font-bold text-paper transition hover:bg-gold"
