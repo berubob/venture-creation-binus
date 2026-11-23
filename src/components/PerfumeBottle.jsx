@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useScroll, useGLTF } from '@react-three/drei';
@@ -116,6 +116,49 @@ function buildCarton(scene) {
   return root;
 }
 
+// Tinggi area teks hero (px), diukur dari DOM. HERO_TEXT_H hanya nilai awal sebelum terukur.
+function useHeroTextHeight(enabled) {
+  const [h, setH] = useState(HERO_TEXT_H);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let raf = 0;
+    let ro;
+    let tries = 0;
+
+    const measure = (el) => {
+      const sec = el.offsetParent;
+      if (!sec) return;
+      // dari atas judul sampai dasar layar, ditambah lebar fade supaya judul tidak ikut memudar
+      const next = Math.round(sec.clientHeight - el.offsetTop + LINE_FADE + 6);
+      setH((cur) => (Math.abs(cur - next) > 1 ? next : cur));
+    };
+
+    const find = () => {
+      const el = document.getElementById('hero-title');
+      if (!el) {
+        if (tries++ < 120) raf = requestAnimationFrame(find); // Overlay belum terpasang
+        return;
+      }
+      measure(el);
+      ro = new ResizeObserver(() => measure(el));
+      const sec = el.offsetParent;
+      if (sec) {
+        ro.observe(sec);
+        Array.from(sec.children).forEach((c) => ro.observe(c));
+      }
+    };
+    find();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+    };
+  }, [enabled]);
+
+  return h;
+}
+
 export default function PerfumeBottle({ variant }) {
   const { scene } = useGLTF(variant.model);
   const ingredients = variant.ingredients;
@@ -145,6 +188,7 @@ export default function PerfumeBottle({ variant }) {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const mobile = width < 768;
+  const heroTextH = useHeroTextHeight(mobile);
 
   useEffect(() => {
     const dom = gl.domElement;
@@ -192,7 +236,7 @@ export default function PerfumeBottle({ variant }) {
   const mobileHero = useMemo(() => {
     const h = (bottle.top - bottle.bottom) * S; // tinggi botol + tutup terangkat, skala 1
     const unit = viewH / height; // satuan dunia per px layar
-    const free = Math.max(140, height - NAV_H - HERO_TEXT_H);
+    const free = Math.max(140, height - NAV_H - heroTextH);
     const bottomPx = (y, s) => height / 2 - y / unit + (s * h) / (2 * unit); // dasar botol di layar
     return {
       s: clamp((free * 0.9 * unit) / h, 0.25, 0.7),
@@ -200,7 +244,7 @@ export default function PerfumeBottle({ variant }) {
       line: NAV_H + free,
       endLine: bottomPx(END.y, END.s) + END_GAP,
     };
-  }, [bottle, viewH, height]);
+  }, [bottle, viewH, height, heroTextH]);
 
   const targets = useMemo(() => makeTargets(ingredients.length, mobileHero), [ingredients, mobileHero]);
 
