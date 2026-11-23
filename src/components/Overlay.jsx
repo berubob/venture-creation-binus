@@ -1,6 +1,6 @@
 import { NOTE_LEVELS } from '../data/variants';
 import { SIZES } from '../data/products';
-import { openShop } from '../cartStore';
+import { openShop, openNotes } from '../cartStore';
 import Footer from './Footer';
 import Price from './Price';
 
@@ -105,6 +105,12 @@ export default function Overlay({ variant, onNavigate }) {
             className="cursor-pointer border-b border-ink pb-0.5 text-sm font-bold transition hover:border-gold hover:text-gold"
           >
             Kenali aromanya
+          </button>
+          <button
+            onClick={openNotes}
+            className="cursor-pointer border-b border-ink pb-0.5 text-sm font-bold transition hover:border-gold hover:text-gold"
+          >
+            Semua bahan ({variant.ingredients.length + (variant.supporting?.length ?? 0)})
           </button>
         </div>
 

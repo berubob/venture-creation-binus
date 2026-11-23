@@ -4,6 +4,7 @@ import { INSTAGRAM_URL } from '../data/products';
 import { getScrollEl, subscribeScrollEl } from '../scrollStore';
 import { openCart, openShop, setVariant, useCartCount, useStore } from '../cartStore';
 import { preloadVariant } from '../modelUtils';
+import { openNotes } from '../cartStore';
 
 const CartIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
@@ -175,6 +176,14 @@ export default function Navbar({ onNavigate }) {
                     </button>
                   </li>
                 ))}
+                <li className="border-t border-line">
+                  <button
+                    onClick={() => { openNotes(); setMenu(false); }}
+                    className="w-full cursor-pointer px-3 py-2 text-left font-bold transition hover:bg-ink/5"
+                  >
+                    Semua bahan
+                  </button>
+                </li>
               </ul>
             )}
           </li>

@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400&family=Lato:wght@300;400;700&display=swap');
 @import "tailwindcss";
 
-/* Palet diambil dari kemasan: Yisery krem dan dusty rose, Midbel navy malam dengan krem hangat.
+/* Palet diambil dari kemasan: Yisery krem dan dusty rose, Cithea krem kekuningan dengan emas hangat.
    Warna dibaca lewat variabel, jadi seluruh halaman berganti tema cukup dengan data-theme. */
 @theme inline {
   --font-display: 'Bodoni Moda', 'Didot', Georgia, serif;
@@ -22,12 +22,12 @@
   --c-gold: #8a6226;
 }
 
-[data-theme='midbel'] {
-  --c-paper: #0f1b2b;
-  --c-ink: #efe4d0;
-  --c-mute: #a9b3c4;
-  --c-line: #2b3b55;
-  --c-gold: #cdb184;
+[data-theme='cithea'] {
+  --c-paper: #fbf7e6;
+  --c-ink: #3a3020;
+  --c-mute: #7d7355;
+  --c-line: #e5dcae;
+  --c-gold: #8a6226;
 }
 
 html {
