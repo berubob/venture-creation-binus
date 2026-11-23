@@ -11,6 +11,7 @@ import { getVariant } from './data/variants';
 import { closeShop, openShop, useStore } from './cartStore';
 import { setScrollEl, scrollToPage } from './scrollStore';
 import { DPR, LITE, SHADOW_RES } from './perf';
+import NotesDrawer from './components/NotesDrawer';
 
 // Halaman admin stok dimuat terpisah (lazy), jadi pengunjung biasa tidak mengunduh kodenya
 const Admin = lazy(() => import('./components/Admin'));
@@ -139,6 +140,7 @@ function Storefront() {
       {!shopOpen && <Home variant={variant} />}
       <Shop />
       <CartDrawer />
+      <NotesDrawer variant={variant} onNavigate={(p) => scrollToPage(p, variant.pages)} />
     </div>
   );
 }

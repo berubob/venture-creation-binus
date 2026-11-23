@@ -113,3 +113,5 @@ export const closeShop = () => set({ shopOpen: false });
 export const selectProduct = (productId) => set({ shopProduct: productId });
 export const openCart = () => set({ cartOpen: true });
 export const closeCart = () => set({ cartOpen: false });
+export const openNotes = () => set({ notesOpen: true });
+export const closeNotes = () => set({ notesOpen: false });

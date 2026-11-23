@@ -1,74 +1,79 @@
+// Bahan UTAMA Yisery: punya model 3D dan satu halaman scroll sendiri.
+// Top    : Cherry, Lavender            (pendukung: Bergamot, lihat supporting.js)
+// Middle : Orange Blossom, Jasmine
+// Base   : Vanilla, Amber              (pendukung: Musk, lihat supporting.js)
+
+// Nama node di yisery_ingredients_3d.glb
+// CATATAN: GLB yang ada sekarang baru memuat cherry, orange blossom, vanilla, dan amber.
+// Node lavender_* dan jasmine_* di bawah harus ditambahkan ke GLB (tanpa itu keduanya belum tampil, tetapi halaman tidak error).
 const pod = (n) => [
   ...[1, 2, 3, 4, 5, 6].map((i) => `vanilla_pod_${n}_segment_${i}`),
   ...[1, 2, 3, 4, 5].map((i) => `vanilla_pod_${n}_joint_${i}`),
   `vanilla_ridge_${n}`,
 ];
 const crystal = (i) => [`amber_resin_crystal_${i}`];
+const lavender = (n) => [`lavender_stem_${n}`, `lavender_florets_${n}`, `lavender_leaves_${n}`];
+const jasmineBlossom = (n) => [`jasmine_b${n}_petals`, `jasmine_b${n}_tube`, `jasmine_b${n}_calyx`, `jasmine_b${n}_dew`];
+const jasmineBud = (n) => [`jasmine_bud_${n}`, `jasmine_bud_${n}_calyx`];
 
 export const INGREDIENTS = [
   {
-    id: 'mandarin',
-    name: 'Mandarin',
-    latin: 'Citrus reticulata',
-    note: 'top',
-    color: '#f28c28',
-    accent: '#ffb866',
-    description:
-      'Mandarin dan tangerine adalah kerabat dekat bergamot yang lebih manis dan berair. Minyaknya dipress dingin dari kulit buah segar, dan kesan cerahnya muncul paling awal begitu botol dibuka. Bahan ini jadi benang merah dua inspirasi VNS: ia berada di puncak Libre Intense sekaligus Cherry in the Air.',
-    facts: [
-      { label: 'Asal', value: 'Mediterania dan Asia' },
-      { label: 'Ekstraksi', value: 'Cold-press kulit buah' },
-      { label: 'Kesan', value: 'Segar, manis, berair' },
-    ],
-    particles: {
-      count: 12,
-      size: 0.5,
-      dir: 1,
-      glow: '#7a3200',
-      variants: [
-        ['mandarin_fruit_1', 'mandarin_stem_1'],
-        ['mandarin_fruit_2', 'mandarin_stem_2'],
-        ['mandarin_fruit_3', 'mandarin_stem_3'],
-      ],
-    },
-  },
-  {
     id: 'cherry',
-    name: 'Black Cherry',
-    latin: 'Prunus cerasus (akord)',
+    name: 'Cherry',
+    latin: 'Prunus avium',
     note: 'top',
     color: '#a3122f',
     accent: '#ff6b81',
     description:
-      'Aroma ceri dalam parfum hampir selalu dibangun sebagai akord, karena buahnya tidak menghasilkan minyak yang bisa diekstraksi langsung. Hasilnya tidak sekadar manis: ada sisi asam yang segar dan sentuhan almond. Di VNS, ceri hitam membawa karakter ceria ala kebun ceri musim panas.',
+      'Membawa ledakan manis buah beri merah yang pekat, sedikit asam, dan menggoda di semprotan pertama. Memberikan karakter bold dan sensual yang langsung mencuri perhatian sejak detik awal.',
     facts: [
-      { label: 'Asal', value: 'Inspirasi kebun ceri' },
-      { label: 'Ekstraksi', value: 'Akord, dirakit dari aroma buah' },
-      { label: 'Kesan', value: 'Manis, sedikit asam, ceria' },
+      { label: 'Asal', value: 'Eropa dan Asia Barat' },
+      { label: 'Ekstraksi', value: 'Rekonstruksi molekul aromatik (benzaldehyde dan ekstrak buah)' },
+      { label: 'Kesan', value: 'Manis pekat, juicy, sensual, berani' },
     ],
     particles: {
       count: 10,
       size: 0.6,
       dir: -1,
       glow: '#3d0010',
-      variants: [
-        ['black_cherry_1', 'black_cherry_2', 'black_cherry_3', 'cherry_stem_1', 'cherry_stem_2'],
-      ],
+      variants: [['black_cherry_1', 'black_cherry_2', 'black_cherry_3', 'cherry_stem_1', 'cherry_stem_2']],
+    },
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender',
+    latin: 'Lavandula angustifolia',
+    note: 'top',
+    color: '#7a5aa8',
+    accent: '#b79ae0',
+    description:
+      'Bunga herbal aromatik yang memberikan kesan bersih, menenangkan, dan elegan. Kehadirannya menyeimbangkan rasa manis ceri agar terasa lebih dewasa, segar, dan berkelas.',
+    facts: [
+      { label: 'Asal', value: 'Provence, Prancis dan Mediterania' },
+      { label: 'Ekstraksi', value: 'Distilasi uap pucuk bunga segar' },
+      { label: 'Kesan', value: 'Aromatik bersih, herbal segar, menenangkan, elegan' },
+    ],
+    particles: {
+      count: 14,
+      size: 0.75,
+      dir: 1,
+      glow: '#2a1a4a',
+      variants: [lavender(1), lavender(2)],
     },
   },
   {
     id: 'orange-blossom',
     name: 'Orange Blossom',
-    latin: 'Citrus aurantium (bunga)',
+    latin: 'Citrus × sinensis',
     note: 'middle',
-    color: '#f3e6c4',
+    color: '#f3e1b0',
     accent: '#fff0c9',
     description:
-      'Bunga jeruk pahit yang diolah menjadi absolut. Di Libre Intense, absolut orange blossom asal Maroko berhadapan dengan lavender dari Prancis, dan ketegangan itulah tanda tangannya. Di VNS ia menjadi inti floral yang lembut, creamy, dan hangat.',
+      'Bunga putih dari pohon jeruk yang memancarkan aroma madu lembut, cerah, dan bersih. Menjadi jembatan transisi yang bercahaya antara kesegaran buah di awal dan kehangatan dasar parfum.',
     facts: [
-      { label: 'Asal', value: 'Maroko' },
-      { label: 'Ekstraksi', value: 'Absolut dari kuntum bunga' },
-      { label: 'Kesan', value: 'Floral, creamy, hangat' },
+      { label: 'Asal', value: 'Tunisia, Maroko, dan Mediterania' },
+      { label: 'Ekstraksi', value: 'Ekstraksi pelarut dan distilasi uap kelopak bunga' },
+      { label: 'Kesan', value: 'Floral cerah, manis madu lembut, bersih, mewah' },
     ],
     particles: {
       count: 30,
@@ -84,6 +89,28 @@ export const INGREDIENTS = [
     },
   },
   {
+    id: 'jasmine',
+    name: 'Jasmine',
+    latin: 'Jasminum grandiflorum',
+    note: 'middle',
+    color: '#d9d4b8',
+    accent: '#f6f1df',
+    description:
+      'Bunga putih klasik yang memberikan dimensi sensual, kaya, dan memikat pada inti parfum. Memperkuat karakter elegan dari Orange Blossom dengan sentuhan floral yang lebih dalam.',
+    facts: [
+      { label: 'Asal', value: 'India, Mesir, dan Grasse (Prancis)' },
+      { label: 'Ekstraksi', value: 'Enfleurage modern atau ekstraksi pelarut kelopak bunga' },
+      { label: 'Kesan', value: 'Floral mewah, sensual, lembut, memikat' },
+    ],
+    particles: {
+      count: 22,
+      size: 0.55,
+      dir: 1,
+      glow: '#fff3c4',
+      variants: [jasmineBlossom(1), jasmineBlossom(2), jasmineBud(1), jasmineBud(2)],
+    },
+  },
+  {
     id: 'vanilla',
     name: 'Vanilla',
     latin: 'Vanilla planifolia',
@@ -91,16 +118,16 @@ export const INGREDIENTS = [
     color: '#b8864b',
     accent: '#e9c58a',
     description:
-      'Polong anggrek vanila diserbuki satu per satu dengan tangan, lalu dikeringkan berbulan-bulan sampai aromanya matang. Madagaskar adalah produsen terbesar dunia. Vanila adalah titik temu kedua inspirasi VNS: berpadu dengan tonka di Libre Intense, dan melembutkan ceri di Cherry in the Air.',
+      'Diambil dari polong anggrek yang difermentasi, vanila menghadirkan selimut manis yang creamy dan hangat. Ia menyatu sempurna dengan jejak ceri dari fase awal, menciptakan akhir aroma yang lembut dan adiktif.',
     facts: [
-      { label: 'Asal', value: 'Madagaskar' },
-      { label: 'Ekstraksi', value: 'Ekstrak dari polong kering' },
-      { label: 'Kesan', value: 'Manis, creamy, nyaman' },
+      { label: 'Asal', value: 'Madagaskar dan Meksiko' },
+      { label: 'Ekstraksi', value: 'Ekstraksi pelarut dari polong kering terfermentasi' },
+      { label: 'Kesan', value: 'Manis lembut, creamy, hangat, menenangkan' },
     ],
     particles: {
       count: 20,
       size: 0.8,
-      dir: 1,
+      dir: -1,
       glow: '#6b4423',
       variants: [pod(1), pod(2)],
     },
@@ -108,16 +135,16 @@ export const INGREDIENTS = [
   {
     id: 'amber',
     name: 'Amber',
-    latin: 'Ambergris, tonka, vetiver',
+    latin: 'Resina fossilis (resin fosil, akord balsamik)',
     note: 'base',
     color: '#c77a1c',
     accent: '#f0b45a',
     description:
-      'Dasar yang menutup piramida aroma. Akord ambergris memberi kehangatan, biji tonka dari Amerika Selatan menambah sisi manis seperti kacang dan vanila, sementara vetiver (akar wangi) dari Haiti dan Jawa memberi tulang berkayu. Dialah jejak yang bertahan di kulit setelah note lain menghilang.',
+      'Memberikan kedalaman resin keemasan yang hangat, kaya, dan tahan lama di kulit. Amber mengunci seluruh susunan bunga putih dan vanila agar meninggalkan jejak aroma yang berkelas hingga berjam-jam.',
     facts: [
-      { label: 'Asal', value: 'Amerika Selatan, Haiti, Jawa' },
-      { label: 'Ekstraksi', value: 'Akord, biji tonka, akar wangi' },
-      { label: 'Kesan', value: 'Hangat, manis, berkayu' },
+      { label: 'Asal', value: 'Wilayah Baltik dan Timur Tengah' },
+      { label: 'Ekstraksi', value: 'Infusi resin alam (labdanum, benzoin) dan molekul amber' },
+      { label: 'Kesan', value: 'Hangat keemasan, balsamik, dalam, tahan lama' },
     ],
     particles: {
       count: 20,

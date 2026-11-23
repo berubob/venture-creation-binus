@@ -1,8 +1,11 @@
 import { INGREDIENTS as YISERY_INGREDIENTS, NOTE_LEVELS } from './ingredients';
-import { MIDBEL_INGREDIENTS } from './midbelIngredients';
+import { CITHEA_INGREDIENTS } from './citheaIngredients';
+import { SUPPORTING } from './supporting';
 
 export { NOTE_LEVELS };
 
+// pages = hero + satu halaman per bahan UTAMA + halaman pemesanan.
+// Bahan pendukung (supporting) tidak menambah halaman: tampil di panel "Semua bahan".
 const make = (v) => ({ ...v, pages: v.ingredients.length + 2 });
 
 export const VARIANTS = {
@@ -13,7 +16,7 @@ export const VARIANTS = {
     quote: 'Elegansi yang tak lekang oleh waktu.',
     desc: 'Kotak krem-pink dengan aroma manis dan fruity.',
     footer:
-      'Eau de parfum dengan tiga lapis aroma: mandarin dan ceri hitam, orange blossom, serta vanila dan amber.',
+      'Eau de parfum dengan tiga lapis aroma: ceri, bergamot, dan lavender di puncak; orange blossom dan melati di jantung; lalu vanila, amber, dan musk di dasar.',
     color: '#d98aa0',
     model: '/models/VNS_Yisery.glb',
     ingredientsModel: '/models/yisery_ingredients_3d.glb',
@@ -22,23 +25,25 @@ export const VARIANTS = {
     liquid: { color: '#f28a21', emissive: 0.35 }, // oranye
     light: { env: 1, rim: '#ffd9c2', rimIntensity: 1.4, shadow: '#5a3a30', shadowOpacity: 0.3 },
     ingredients: YISERY_INGREDIENTS,
+    supporting: SUPPORTING.yisery,
   }),
-  midbel: make({
-    id: 'midbel',
-    name: 'Midbel',
-    tagline: 'Modern Evening',
-    quote: 'Modern Evening, dibuat untuk pria.',
-    desc: 'Kotak hitam dengan karakter malam yang modern, untuk pria.',
+  cithea: make({
+    id: 'cithea',
+    name: 'Cithea',
+    tagline: 'Sunny Fresh',
+    quote: 'Cerah seperti matahari pagi.',
+    desc: 'Kemasan krem kekuningan dengan aroma segar, manis, dan hangat.',
     footer:
-      'Eau de parfum 15 ml dengan tiga lapis aroma: nanas, apel hijau, dan bergamot di puncak, kapulaga dan vanila di jantung, lalu karamel, cendana, dan cedar di dasar.',
-    color: '#1b2340',
-    model: '/models/VNS_Midbel.glb',
-    ingredientsModel: '/models/midbel_ingredients_3d.glb',
-    bg: { base: '/bg/midbel.webp', line: '/bg/midbel-line.webp' },
+      'Eau de parfum 15 ml dengan tiga lapis aroma: earl grey, apel hijau, dan lemon Sisilia di puncak; melati, mawar, dan bambu di jantung; lalu cedar Virginia, cendana, dan musk di dasar.',
+    color: '#e9dd8a',
+    model: '/models/VNS_Cithea.glb',
+    ingredientsModel: '/models/cithea_ingredients_3d.glb',
+    bg: { base: '/bg/cithea.webp', line: '/bg/cithea-line.webp' },
     bodyNodes: ['Bottle_Body'],
-    liquid: { color: '#eaf6fb', clear: true }, // bening
-    light: { env: 0.9, rim: '#9db4e8', rimIntensity: 3.4, shadow: '#000000', shadowOpacity: 0.55 },
-    ingredients: MIDBEL_INGREDIENTS,
+    liquid: { color: '#f3e27a', emissive: 0.35 }, // kuning pucat
+    light: { env: 1, rim: '#fff3c4', rimIntensity: 1.4, shadow: '#5a4a20', shadowOpacity: 0.3 },
+    ingredients: CITHEA_INGREDIENTS,
+    supporting: SUPPORTING.cithea,
   }),
 };
 
